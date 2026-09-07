@@ -1,0 +1,9 @@
+# Anyone invited can work on frontend
+# /frontend/ *   --> Means all can do anything for this dir.
+/frontend/  *
+
+# Only Omar and Maria can approve changes to backend and database
+# /backend/ @omartegar-username @maria-username
+/backend/ @omartegar 
+/database/ @omartegar
+
