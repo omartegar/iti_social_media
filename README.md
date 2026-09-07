@@ -3,6 +3,7 @@
 
 ```
 Group name: The Debuggers
+Project Title: Social Media Website
 
 Developers:
 
