@@ -1,5 +1,4 @@
-### iti_social_media
-
+### Project Info
 
 ```
 Group name: The Debuggers
