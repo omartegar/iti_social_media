@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sign Up</title>
+
     <link rel="stylesheet" href="style.css" />
   </head>
 
@@ -14,12 +15,21 @@
       <p>Join our social media community</p>
 
       <form>
-        <label for="name">Full Name</label>
+        <label for="firstname">First Name</label>
         <input
           type="text"
-          id="name"
-          name="name"
-          placeholder="Enter your name"
+          id="firstname"
+          name="firstname"
+          placeholder="Enter your first name"
+          required
+        />
+
+        <label for="lastname">Last Name</label>
+        <input
+          type="text"
+          id="lastname"
+          name="lastname"
+          placeholder="Enter your last name"
           required
         />
 
@@ -31,6 +41,18 @@
           placeholder="Enter your email"
           required
         />
+
+        <label for="phone">Phone</label>
+        <input
+          type="tel"
+          id="phone"
+          name="phone"
+          placeholder="Enter your phone number"
+          required
+        />
+
+        <label for="image">Profile Image</label>
+        <input type="file" id="image" name="image" accept="image/*" />
 
         <label for="password">Password</label>
         <input
