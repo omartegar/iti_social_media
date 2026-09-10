@@ -20,8 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `social_media`
 --
-CREATE DATABASE IF NOT EXISTS social_media;
-USE social_media;
+-- CREATE DATABASE IF NOT EXISTS social_media;
+-- USE social_media;
 -- --------------------------------------------------------
 
 --

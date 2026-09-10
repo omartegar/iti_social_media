@@ -5,11 +5,12 @@ if ($_SERVER['REQUEST_METHOD'] !== "POST") {
     exit;
 }
 
-function validateInputs($firstname,  $lastname,  $email,  $password,  $confirmpassword)
+function validateInputs($firstname,  $lastname,  $email, $phone,  $password,  $confirmpassword)
 {
     $namePattern = '/^[a-zA-Z]{3,}$/';
     $emailPattern = '/^[a-zA-Z0-9._%]{4,}+@+[a-zA-Z]{3,}+\.[a-zA-Z]{3,}$/';
     $passwordPattern = '/^[a-zA-Z0-9._%]{8,}$/';
+    $phonePattern = '/^(010|011|012|015)+[0-9]{8}$/'; // 011 47275486
 
     if (!preg_match($namePattern, $firstname)) {
         echo json_encode(['status' => 'failed', 'message' => "Firstname is not valid"]);
@@ -40,6 +41,11 @@ function validateInputs($firstname,  $lastname,  $email,  $password,  $confirmpa
         echo json_encode(['status' => "failed", 'message' => "Passwords are not the same"]);
         exit;
     }
+
+    if (!preg_match($phonePattern, $phone)) {
+        echo json_encode(['status' => 'failed', 'message' => "Please enter a valid egyptian phone number, Ex: 01234567890."]);
+        exit;
+    }
 }
 
 function validateImage()
@@ -65,7 +71,7 @@ function validateImage()
         exit;
     }
 
-    $allowedExt = ['png', 'jpg', 'jpeg', 'webp'];
+    $allowedExt = ['png', 'jpg', 'jpeg', 'webp', 'gif'];
     $fileExtension = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
 
     if (!in_array($fileExtension, $allowedExt)) {
@@ -86,8 +92,8 @@ function validateImage()
     $from = $_FILES['image']['tmp_name'];
     $to = __DIR__ . '/../assets/images/' . $new_image_name;
     if (move_uploaded_file($from, $to)) {
-        echo json_encode(['status' => 'success', 'message' => "Success, image saved"]);
-        exit;
+        // Image saved , continue
+        $_FILES['image']['name'] = $new_image_name;
     } else {
         echo json_encode(['status' => "failed", 'message' => "Image failed to move in server"]);
         exit;
@@ -106,22 +112,39 @@ try {
     $isAdmin = 0;
     $image = $_FILES['image'];
 
-    validateInputs($firstname, $lastname, $email, $password, $confirmpassword);
+    validateInputs($firstname, $lastname, $email, $phone, $password, $confirmpassword);
     validateImage();
 
-    echo json_encode([
-        'status' => 'success',
-        'firstname' => $firstname,
-        'lastname' => $lastname,
+
+    require(__DIR__ . '/../config/conn.php');
+
+    $stmt = $pdo->prepare("INSERT INTO users 
+        (first_name, last_name, email, password, phone, is_admin, token, profile_picture)
+        VALUES
+        (:first_name, :last_name, :email, :password, :phone, :is_admin, :token, :profile_picture);
+    ");
+
+    if ($stmt->execute([
+        'first_name' => $firstname,
+        'last_name' => $lastname,
         'email' => $email,
-        'password' => $password,
-        'confirmpassword' => $confirmpassword,
+        'password' => password_hash($password, PASSWORD_DEFAULT),
         'phone' => $phone,
-        'isAdmin' => $isAdmin,
-        'image' => $_FILES['image']
-    ]);
-    exit;
+        'is_admin' => $isAdmin,
+        'token' => null,
+        'profile_picture' => $_FILES['image']['name']
+    ])) {
+        echo json_encode(['status' => 'success', 'message' => "Account created successfully"]);
+        exit;
+    } else {
+        echo json_encode(['status' => 'failed', 'message' => "An error occured while creating account"]);
+        exit;
+    }
 } catch (Exception $err) {
-    echo json_encode(['status' => "failed", 'message' => "An error occurred while signing up, try again later."]);
+    if ($err->getCode() == 23000) {
+        echo json_encode(['status' => 'failed', 'message' => "These credentials is already available or added recently."]);
+        exit;
+    }
+    echo json_encode(['status' => "failed", 'message' => "An error occurred while signing up, try again later.", 'error' => $err->getMessage()]);
     exit;
 }
