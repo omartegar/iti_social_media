@@ -16,6 +16,12 @@ if ($request_uri === '/' || $request_uri === "") {
 } else if ($request_uri === '/getHomeData') {
     require(__DIR__ . '/homeData/getHomeData.php');
     exit;
+} else if ($request_uri === "/deletePost") {
+    require(__DIR__ . '/posts/deletePost.php');
+    exit;
+} else if ($request_uri === '/createPost') {
+    require(__DIR__ . '/posts/createPost.php');
+    exit;
 } else {
     echo json_encode(['status' => 'failed', 'message' => "Invalid route or api request"]);
     exit;
