@@ -1,1 +1,194 @@
 <!-- Fares Task -->
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messenger</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="chat-container">
+
+        <aside class="sidebar">
+
+            <div class="sidebar-header">
+                <div>
+                    <h2>Chats</h2>
+                    <p>Messages</p>
+                </div>
+
+                <button class="theme-btn" id="themeBtn">☾</button>
+            </div>
+
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search">
+            </div>
+
+            <div class="friends">
+
+                <div class="friend active"
+                     data-name="Fares"
+                     data-status="Online"
+                     data-email="fares@gmail.com"
+                     data-phone="+20 100 000 0000"
+                     data-about="Hey there! I am using Messenger."
+                     data-message="Hello, how are you?">
+                    <div class="avatar">F</div>
+
+                    <div class="friend-info">
+                        <h3>Fares</h3>
+                        <p>Online</p>
+                    </div>
+                </div>
+
+                <div class="friend"
+                     data-name="Mohamed Khaled"
+                     data-status="Online"
+                     data-email="mohamed@gmail.com"
+                     data-phone="+20 101 000 0000"
+                     data-about="Always available for a good chat."
+                     data-message="How is your project going?">
+                    <div class="avatar">M</div>
+
+                    <div class="friend-info">
+                        <h3>Mohamed Khaled</h3>
+                        <p>Online</p>
+                    </div>
+                </div>
+
+                <div class="friend"
+                     data-name="Omar"
+                     data-status="Offline"
+                     data-email="omar@gmail.com"
+                     data-phone="+20 102 000 0000"
+                     data-about="See you soon."
+                     data-message="See you tomorrow.">
+                    <div class="avatar">O</div>
+
+                    <div class="friend-info">
+                        <h3>Omar</h3>
+                        <p>Offline</p>
+                    </div>
+                </div>
+
+                <div class="friend"
+                     data-name="Ebtisam"
+                     data-status="Online"
+                     data-email="ebtisam@gmail.com"
+                     data-phone="+20 103 000 0000"
+                     data-about="Have a nice day!"
+                     data-message="Don't forget the meeting.">
+                    <div class="avatar">E</div>
+
+                    <div class="friend-info">
+                        <h3>Ebtisam</h3>
+                        <p>Online</p>
+                    </div>
+                </div>
+
+                <div class="friend"
+                     data-name="Maria Victor"
+                     data-status="Offline"
+                     data-email="maria@gmail.com"
+                     data-phone="+20 104 000 0000"
+                     data-about="Nice talking to you."
+                     data-message="Nice talking to you.">
+                    <div class="avatar">M</div>
+
+                    <div class="friend-info">
+                        <h3>Maria Victor</h3>
+                        <p>Offline</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </aside>
+
+        <main class="chat-area">
+
+            <div class="chat-header">
+
+                <div class="user-profile">
+                    <div class="avatar" id="chatAvatar">F</div>
+
+                    <div>
+                        <h3 id="chatName">Fares</h3>
+                        <span id="chatStatus">Online</span>
+                    </div>
+                </div>
+
+                <button class="info-btn" id="infoBtn">ⓘ</button>
+
+            </div>
+
+            <div class="profile-panel" id="profilePanel">
+
+                <div class="profile-avatar" id="profileAvatar">F</div>
+
+                <h2 id="profileName">Fares</h2>
+
+                <p id="profileStatus">Online</p>
+
+                <div class="profile-info">
+
+                    <div>
+                        <span>Email</span>
+                        <p id="profileEmail">fares@gmail.com</p>
+                    </div>
+
+                    <div>
+                        <span>Phone</span>
+                        <p id="profilePhone">+20 100 000 0000</p>
+                    </div>
+
+                    <div>
+                        <span>About</span>
+                        <p id="profileAbout">Hey there! I am using Messenger.</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="messages" id="messages">
+
+                <div class="message received">
+                    <p>Hello, how are you?</p>
+                    <span>10:30 AM</span>
+                </div>
+
+                <div class="message sent">
+                    <p>I'm good, how about you?</p>
+                    <span>10:31 AM</span>
+                </div>
+
+                <div class="message received">
+                    <p>I'm good too.</p>
+                    <span>10:32 AM</span>
+                </div>
+
+            </div>
+
+            <div class="message-box">
+
+                <input
+                    type="text"
+                    id="messageInput"
+                    placeholder="Write a message..."
+                >
+
+                <button id="sendBtn">Send</button>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
