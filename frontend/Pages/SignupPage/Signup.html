@@ -72,6 +72,9 @@
           required
         />
 
+        <p id="errorMessage">
+          <!-- ERROR MESSAGE IF RETURNED BY BACKEND -->
+        </p>
         <button type="submit">Sign Up</button>
       </form>
 
@@ -80,5 +83,53 @@
         <a href="../LoginPage/Login.html">Login</a>
       </p>
     </div>
+
+    <script type="module">
+      import { signup } from "../../api.js";
+      const form = document.forms[0];
+      form.addEventListener("submit", (e) => {
+        e.preventDefault(); // to stop default submit reload page
+        requestDataToServer(); // to start the function to backend
+      });
+
+      const errorMessage = document.getElementById("errorMessage");
+      const firstname = document.getElementById("firstname");
+      const lastname = document.getElementById("lastname");
+      const email = document.getElementById("email");
+      const image = document.getElementById("image");
+      const phone = document.getElementById("phone");
+      const password = document.getElementById("password");
+      const confirm_password = document.getElementById("confirm-password");
+
+      async function requestDataToServer() {
+        errorMessage.innerText = ""; // clear text on each start of function
+
+        const fd = new FormData(); // This is used for forms only!
+        fd.append("firstname", errorMessage.value);
+        fd.append("lastname", lastname.value);
+        fd.append("email", email.value);
+        fd.append("password", password.value);
+        fd.append("confirmpassword", confirm_password.value);
+        fd.append("phone", phone.value);
+        fd.append("image", image.files[0]); // ".files[0]" catch first image file uploaded from element
+
+        const response = await fetch(signup, {
+          method: "POST",
+          body: fd,
+        });
+
+        const data = await response.json(); // this is an object returned from api(backend)
+
+        if (data.status === "success") {
+          // if account successfully created from backend
+          console.log(data.message);
+          errorMessage.innerText = data.message;
+        } else {
+          // if any error returned from backend
+          console.log(data.message);
+          errorMessage.innerText = data.message;
+        }
+      }
+    </script>
   </body>
 </html>
