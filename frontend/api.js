@@ -14,3 +14,13 @@ export const login = `${serverIp}:${port}/login`;
 // getHomeData API: method => GET
 // headers: {Authorization: localStorage.getItem('token')}
 export const getHomeData = `${serverIp}:${port}/getHomeData`;
+
+// createPost API: method => POST
+// headers: {Authorization: localStorage.getItem('token')}
+// body: {text, image}   ,, One or both
+export const createPost = `${serverIp}:${port}/createPost`;
+
+// deletePost API: method => DELETE
+// headers: {Authorization: localStorage.getItem('token')}
+// body: JSON.stringify({id})
+export const deletePost = `${serverIp}:${port}/deletePost`;
