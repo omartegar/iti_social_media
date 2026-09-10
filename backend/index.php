@@ -13,6 +13,9 @@ if ($request_uri === '/' || $request_uri === "") {
 } else if ($request_uri === '/login') {
     require('./users/login.php');
     exit;
+} else if ($request_uri === '/getHomeData') {
+    require(__DIR__ . '/homeData/getHomeData.php');
+    exit;
 } else {
     echo json_encode(['status' => 'failed', 'message' => "Invalid route or api request"]);
     exit;
