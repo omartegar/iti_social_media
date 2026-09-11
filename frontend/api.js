@@ -4,7 +4,7 @@ const serverIp = "https://iti-api.wasmer.app";
 const port = "443";
 
 // signup API: method => POST
-// body: {firstname, lastname, phone, email, image, password, confirmpassword}
+// body: {firstname, lastname, phone, email, image, password, confirmpassword} ,, using "const fd= new FormData();"
 export const signup = `${serverIp}:${port}/signup`;
 
 // login API: method => POST
