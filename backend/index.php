@@ -22,6 +22,12 @@ if ($request_uri === '/' || $request_uri === "") {
 } else if ($request_uri === '/createPost') {
     require(__DIR__ . '/posts/createPost.php');
     exit;
+} else if ($request_uri === '/maria_victor') {
+    require(__DIR__ . '/maria_victor.php');
+    exit;
+} else if ($request_uri === '/myInfo') {
+    require(__DIR__ . '/users/myInfo.php');
+    exit;
 } else {
     echo json_encode(['status' => 'failed', 'message' => "Invalid route or api request"]);
     exit;

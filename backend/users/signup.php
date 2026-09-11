@@ -109,7 +109,6 @@ try {
     $password = $_POST['password'];
     $confirmpassword = $_POST['confirmpassword'];
     $phone = $_POST['phone'];
-    $isAdmin = 0;
     $image = $_FILES['image'];
 
     validateInputs($firstname, $lastname, $email, $phone, $password, $confirmpassword);
