@@ -12,8 +12,18 @@ function validateInputs($firstname,  $lastname,  $email, $phone,  $password,  $c
     $passwordPattern = '/^[a-zA-Z0-9._%]{8,}$/';
     $phonePattern = '/^(010|011|012|015)+[0-9]{8}$/'; // 011 47275486
 
+    if (!isset($firstname) || $firstname === "undefined") {
+        echo json_encode(['status' => 'failed', 'message' => "Please fill firstname field"]);
+        exit;
+    }
+
     if (!preg_match($namePattern, $firstname)) {
         echo json_encode(['status' => 'failed', 'message' => "Firstname is not valid"]);
+        exit;
+    }
+
+    if (!isset($lastname) || $lastname === "undefined") {
+        echo json_encode(['status' => 'failed', 'message' => "Please fill lastname field"]);
         exit;
     }
 
@@ -129,7 +139,7 @@ try {
         'email' => $email,
         'password' => password_hash($password, PASSWORD_DEFAULT),
         'phone' => $phone,
-        'is_admin' => $isAdmin,
+        'is_admin' => null,
         'token' => null,
         'profile_picture' => $_FILES['image']['name']
     ])) {

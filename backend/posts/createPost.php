@@ -24,6 +24,7 @@ try {
 
     if (isset($text) && strlen($text) > 5 && isset($image) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         // both
+
     }
 
     // text only
