@@ -24,3 +24,7 @@ export const createPost = `${serverIp}:${port}/createPost`;
 // headers: {Authorization: localStorage.getItem('token')}
 // body: JSON.stringify({id})
 export const deletePost = `${serverIp}:${port}/deletePost`;
+
+// getUserProfile API: method => GET
+// headers: {Authorization: localStorage.getItem('token')}
+export const myInfo = `${serverIp}:${port}/myInfo`;
