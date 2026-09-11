@@ -1,10 +1,5 @@
-<!-- Maria -->
-
-<!-- Image (circle), Fullname, Email, created_at date  -->
-
-
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,6 +30,7 @@
         border-radius: 50%;
         object-fit: cover;
         margin-bottom: 14px;
+        background: #cfd3d8;
     }
     .name {
         font-size: 20px;
@@ -55,30 +51,80 @@
         font-weight: 500;
         color: #65676b;
     }
+    .error { color: #d93025; font-size: 14px; margin-top: 10px; }
 
     @media (max-width: 480px) {
-        body {
-            padding-top: 40px;
-        }
-        .avatar {
-            width: 90px;
-            height: 90px;
-        }
-        .name {
-            font-size: 18px;
-        }
-        .email, .joined {
-            font-size: 14px;
-        }
+        body { padding-top: 40px; }
+        .avatar { width: 90px; height: 90px; }
+        .name { font-size: 18px; }
+        .email, .joined { font-size: 14px; }
     }
 </style>
 </head>
 <body>
     <div class="profile">
-        <img class="avatar" src="images/f547d800625af9056d62efe8969aeea0.jpg" alt="Profile picture">
-        <div class="name">Name: Maria Victor</div>
-        <div class="email">Email: Maria@gmail.com</div>
-        <div class="joined">Created at: 07 Sep 2026</div>
+        <img class="avatar" id="avatar" src="images/f547d800625af9056d62efe8969aeea0.jpg" alt="Profile picture">
+        <div class="name" id="name">Loading...</div>
+        <div class="email" id="email"></div>
+        <div class="joined" id="joined"></div>
+        <div class="error" id="errorMsg"></div>
     </div>
+
+    <script type="module">
+    import { myInfo } from "../../api.js";
+
+    async function loadProfile() {
+        const avatarEl = document.getElementById("avatar");
+        const nameEl = document.getElementById("name");
+        const emailEl = document.getElementById("email");
+        const joinedEl = document.getElementById("joined");
+        const errorMsgEl = document.getElementById("errorMsg");
+
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            if (nameEl) nameEl.textContent = "";
+            if (errorMsgEl) errorMsgEl.textContent = "Please login first.";
+            return;
+        }
+
+        try {
+            const response = await fetch(myInfo, {
+                method: "GET",
+                headers: {
+                    Authorization:  localStorage.getItem('token')
+                }
+            });
+
+            const data = await response.json();
+            console.log("Response Data:", data);
+
+            if (data.status === "success" || response.ok) {
+                const user = data.user_info;
+
+                const firstname = user?.first_name || user?.firstname || "";
+                const lastname = user?.last_name || user?.lastname || "";
+                const email = user?.email || "";
+                const createdAt = user?.created_at || user?.createdAt || "";
+                const userImage = "images/f547d800625af9056d62efe8969aeea0.jpg";
+
+                if (avatarEl) avatarEl.src = userImage;
+                if (nameEl) nameEl.textContent = `Name: ${firstname} ${lastname}`.trim();
+                if (emailEl) emailEl.textContent = `Email: ${email}`;
+                if (joinedEl) joinedEl.textContent = `Created at: ${createdAt}`;
+                if (errorMsgEl) errorMsgEl.textContent = "";
+            } else {
+                if (nameEl) nameEl.textContent = "";
+                if (errorMsgEl) errorMsgEl.textContent = data.message || "Failed to load profile.";
+            }
+        } catch (err) {
+            console.error("Fetch Error:", err);
+            if (nameEl) nameEl.textContent = "";
+            if (errorMsgEl) errorMsgEl.textContent = "Server connection error.";
+        }
+    }
+
+    loadProfile();
+</script>
 </body>
 </html>

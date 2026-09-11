@@ -105,7 +105,7 @@
         errorMessage.innerText = ""; // clear text on each start of function
 
         const fd = new FormData(); // This is used for forms only!
-        fd.append("firstname", errorMessage.value);
+        fd.append("firstname", firstname.value);
         fd.append("lastname", lastname.value);
         fd.append("email", email.value);
         fd.append("password", password.value);
