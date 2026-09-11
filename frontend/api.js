@@ -17,7 +17,7 @@ export const getHomeData = `${serverIp}:${port}/getHomeData`;
 
 // createPost API: method => POST
 // headers: {Authorization: localStorage.getItem('token')}
-// body: {text, image}   ,, One or both
+// body: fd                  , const fd = new FormData() and add (text|image or both)
 export const createPost = `${serverIp}:${port}/createPost`;
 
 // deletePost API: method => DELETE
