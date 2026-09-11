@@ -28,3 +28,34 @@ export const deletePost = `${serverIp}:${port}/deletePost`;
 // getUserProfile API: method => GET
 // headers: {Authorization: localStorage.getItem('token')}
 export const myInfo = `${serverIp}:${port}/myInfo`;
+
+/*
+fetch() usage:
+
+fetch("API_URL_ENDPOINT", OPTIONAL_OPTIONS);
+
+example 1:
+
+async function myFunc()
+{
+
+    const response = fetch("API_URL_ENDPOINT", {
+        method:"GET",
+        headers: {},
+        body: {}
+    });
+
+    const data = await response.json();
+
+    if(data.status === "success"){
+        // BACKEND WORKS AND SENT ANSWER
+    }else{
+        // BACKEND SAYS THERE IS AN ERROR
+        // CHECK IT USING message
+        console.log(data.message);  
+    }
+}
+
+
+
+*/
