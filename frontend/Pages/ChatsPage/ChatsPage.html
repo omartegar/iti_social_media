@@ -101,6 +101,7 @@
       </main>
     </div>
 
+    <script src="openChats.js"></script>
     <script src="script.js"></script>
     <script type="module">
       // BY Omar Ahmed Hashem
@@ -110,10 +111,6 @@
       let friendsList = document.getElementsByClassName("friends")[0];
       let chatsArea = document.getElementsByClassName("chat-area")[0];
       console.log(chatsArea);
-
-      async function openPrivateChat(userId) {
-        console.log(userId);
-      }
 
       async function requestAllUsersFromBackend() {
         const response = await fetch(showAllUsers, {
@@ -134,7 +131,7 @@
             if (user.id !== mySelf.id) {
               friendsList.innerHTML += `
             <div
-            onclick = "openPrivateChat(${user.id});"
+            onclick = "openPrivateChat(${user.id})"
             class="friend"
             data-name="Ebtisam"
             data-status="Online"
