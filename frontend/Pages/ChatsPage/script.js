@@ -7,6 +7,11 @@ themeBtn.addEventListener("click", () => {
 });
 
 document.addEventListener("click", (event) => {
+  if (event.target.closest("#refreshChatBtn")) {
+    window.refreshActiveChat?.();
+    return;
+  }
+
   if (event.target.closest(".info-btn")) {
     document.getElementById("profilePanel")?.classList.toggle("show");
   }

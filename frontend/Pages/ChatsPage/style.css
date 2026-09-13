@@ -247,6 +247,11 @@ body {
   color: var(--secondary);
 }
 
+.chat-actions {
+  display: flex;
+  gap: 8px;
+}
+
 .info-btn {
   width: 38px;
   height: 38px;
@@ -260,6 +265,10 @@ body {
 
 .info-btn:hover {
   background: var(--border);
+}
+
+#refreshChatBtn:active {
+  transform: rotate(180deg);
 }
 
 .profile-panel {

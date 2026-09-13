@@ -94,7 +94,10 @@
                   <span>Private conversation</span>
                 </div>
               </div>
-              <button class="info-btn" id="infoBtn" type="button" aria-label="Show profile">ⓘ</button>
+              <div class="chat-actions">
+                <button class="info-btn" id="refreshChatBtn" type="button" aria-label="Refresh messages" title="Refresh messages">↻</button>
+                <button class="info-btn" id="infoBtn" type="button" aria-label="Show profile" title="Show profile">ⓘ</button>
+              </div>
             </div>
 
             <div class="profile-panel" id="profilePanel">
@@ -129,6 +132,12 @@
             </div>`;
         }
       }
+
+      window.refreshActiveChat = () => {
+        if (window.activeChatUserId) {
+          openPrivateChat(window.activeChatUserId);
+        }
+      };
 
       function renderMessages(messages, currentUserId) {
         if (messages.length === 0) {
