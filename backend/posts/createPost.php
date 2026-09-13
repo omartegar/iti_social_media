@@ -1,6 +1,18 @@
 <?php
 
 header('Content-Type: application/json; charset=utf-8');
+
+function ensureUploadDirectory(string $directory): void
+{
+    if (!is_dir($directory) && !@mkdir($directory, 0755, true) && !is_dir($directory)) {
+        throw new RuntimeException('Unable to create image upload directory: ' . $directory);
+    }
+
+    if (!is_writable($directory)) {
+        throw new RuntimeException('Image upload directory is not writable: ' . $directory);
+    }
+}
+
 require(__DIR__ . '/../config/checkToken.php');
 
 if ($_SERVER['REQUEST_METHOD'] !== "POST") {
@@ -69,7 +81,9 @@ try {
         }
 
         $newFileName = bin2hex(random_bytes(10)) . "." . $imageExt;
-        $uploadPath = __DIR__ . '/../assets/images/' . $newFileName;
+        $uploadDirectory = __DIR__ . '/../assets/images';
+        ensureUploadDirectory($uploadDirectory);
+        $uploadPath = $uploadDirectory . '/' . $newFileName;
         if (!move_uploaded_file($image['tmp_name'], $uploadPath)) {
             echo json_encode(['status' => 'failed', 'message' => "Failed to upload the image inside the server, please try again later"]);
             exit;
