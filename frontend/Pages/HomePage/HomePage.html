@@ -273,17 +273,50 @@
       }
 
       .friends_list {
-        line-height: 34px;
-        font-size: 18px;
-        width: 90%;
+        display: grid;
+        gap: 8px;
+        width: 100%;
         margin: auto;
       }
 
-      .friends_list li {
-        margin-top: 5px;
-        padding: 0px 10px 0 10px;
-        border-radius: 5px;
-        width: fit-content;
+      .friend_item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+        padding: 8px;
+        border-radius: 8px;
+        background: #fff;
+        border: 1px solid #edf0f2;
+      }
+
+      .friend_item img {
+        width: 40px;
+        height: 40px;
+        flex: 0 0 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #cfd3d8;
+      }
+
+      .friend_item_info {
+        min-width: 0;
+      }
+
+      .friend_item_name {
+        margin: 0;
+        overflow: hidden;
+        font-size: 14px;
+        font-family: sans-serif;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      .friend_item_status {
+        margin: 2px 0 0;
+        color: #65676b;
+        font-size: 12px;
+        font-family: sans-serif;
       }
 
       .state-msg {
@@ -291,6 +324,44 @@
         color: #65676b;
         padding: 20px;
         font-family: sans-serif;
+      }
+
+      @media (max-width: 800px) {
+        .container {
+          grid-template-columns: 72px minmax(0, 1fr);
+        }
+
+        .right_side {
+          display: none;
+        }
+
+        .left_link {
+          margin-left: 0;
+        }
+
+        .left_link li {
+          display: none;
+        }
+
+        .left_link a {
+          justify-content: center;
+        }
+      }
+
+      @media (min-width: 801px) and (max-width: 1050px) {
+        .container {
+          grid-template-columns: 160px minmax(0, 2fr) 190px;
+        }
+
+        .friend_item {
+          padding: 6px;
+        }
+
+        .friend_item img {
+          width: 34px;
+          height: 34px;
+          flex-basis: 34px;
+        }
       }
     </style>
   </head>
@@ -570,11 +641,29 @@
         }
 
         filteredFriends.forEach((friend) => {
-          const li = document.createElement("li");
           const friendName =
             `${friend.first_name || ""} ${friend.last_name || ""}`.trim();
-          li.textContent = friendName || friend.name || "Friend";
-          container.appendChild(li);
+          const displayName = friendName || friend.name || "Friend";
+          const friendImage = buildImageUrl(friend.profile_picture);
+          const friendCard = document.createElement("div");
+          friendCard.className = "friend_item";
+          friendCard.innerHTML = `
+            <img src="${friendImage}" alt="${escapeHtml(displayName)} profile picture">
+            <div class="friend_item_info">
+              <p class="friend_item_name">${escapeHtml(displayName)}</p>
+              <p class="friend_item_status">Available to chat</p>
+            </div>`;
+
+          const image = friendCard.querySelector("img");
+          image.addEventListener(
+            "error",
+            () => {
+              image.src = DEFAULT_AVATAR;
+            },
+            { once: true },
+          );
+
+          container.appendChild(friendCard);
         });
       }
 

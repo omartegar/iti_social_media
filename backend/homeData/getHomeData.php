@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] !== "GET") {
 try {
     require(__DIR__ . '/../config/conn.php');
 
-    $friendsStmt = $pdo->prepare("SELECT id, first_name, last_name, email FROM users");
+    $friendsStmt = $pdo->prepare("SELECT id, first_name, last_name, email, profile_picture FROM users");
     $postStmt = $pdo->prepare("SELECT id, user_id, content, image, created_at FROM posts ORDER BY id DESC");
 
     if (!$friendsStmt->execute()) {
