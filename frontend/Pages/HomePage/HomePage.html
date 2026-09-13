@@ -85,6 +85,110 @@
 
       .add_post {
         height: 18vh;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        border: 1px solid #b3acac;
+        border-radius: 6px;
+        cursor: pointer;
+        font-family: sans-serif;
+        color: #65676b;
+        font-size: 16px;
+        background: #fff;
+      }
+
+      .add_post:hover {
+        background: #f0f2f5;
+      }
+
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .modal-overlay.open {
+        display: flex;
+      }
+
+      .modal-box {
+        background: #fff;
+        width: 90%;
+        max-width: 480px;
+        border-radius: 10px;
+        padding: 20px;
+        font-family: sans-serif;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+      }
+
+      .modal-header h3 {
+        margin: 0;
+      }
+
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 22px;
+        cursor: pointer;
+        line-height: 1;
+        color: #65676b;
+      }
+
+      #createPostForm textarea {
+        width: 100%;
+        min-height: 110px;
+        border: 1px solid #dcdfe3;
+        border-radius: 8px;
+        padding: 12px;
+        font-size: 16px;
+        font-family: inherit;
+        resize: vertical;
+        box-sizing: border-box;
+      }
+
+      #createPostForm textarea:focus {
+        outline: none;
+        border-color: #1877f2;
+      }
+
+      #createPostForm input[type="file"] {
+        margin-top: 10px;
+      }
+
+      #createPostForm button[type="submit"] {
+        margin-top: 12px;
+        width: 100%;
+        background: #1877f2;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 10px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      #createPostForm button[type="submit"]:disabled {
+        background: #9cc0f5;
+        cursor: not-allowed;
+      }
+
+      .error {
+        color: #d93025;
+        font-size: 14px;
+        margin-top: 8px;
       }
 
       .post {
@@ -208,7 +312,9 @@
       </div>
 
       <div class="center_side">
-        <div class="add_post"></div>
+        <div class="add_post" id="addPostTrigger">
+          <span>What's on your mind?</span>
+        </div>
         <div id="postsContainer">
           <div class="state-msg" id="stateMsg">Loading posts...</div>
         </div>
@@ -222,13 +328,29 @@
       </div>
     </div>
 
+    <div class="modal-overlay" id="createPostOverlay">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3>Create Post</h3>
+          <button type="button" id="closeModalBtn" class="modal-close">&times;</button>
+        </div>
+        <form id="createPostForm">
+          <textarea id="postText" placeholder="What's on your mind?"></textarea>
+          <input type="file" id="postImage" accept="image/*">
+          <div class="error" id="createPostError"></div>
+          <button type="submit" id="createPostSubmitBtn">Post</button>
+        </form>
+      </div>
+    </div>
+
     <script type="module">
-      import { getHomeData } from "../../api.js";
+      import { getHomeData, createPost } from "../../api.js";
       const UPLOADS_BASE = "https://iti-api.wasmer.app:443/uploads/";
+      const DEFAULT_AVATAR = "../ProfilePage/images/f547d800625af9056d62efe8969aeea0.jpg";
 
       function buildImageUrl(filename) {
-        if (!filename) return "default_avatar.png";
-        if (filename.startsWith("http://") || filename.startsWith("https://")) {
+        if (!filename || filename === "default_avatar.png") return DEFAULT_AVATAR;
+        if (filename.startsWith("http://") || filename.startsWith("https://") || filename.startsWith("../")) {
           return filename;
         }
         return UPLOADS_BASE + filename;
@@ -241,6 +363,8 @@
 
       document.getElementById("logoutLink").addEventListener("click", (e) => {
         e.preventDefault();
+        const confirmed = confirm("Are you sure to log out?");
+        if (!confirmed) return;
         localStorage.removeItem("token");
         window.location.href = "../LoginPage/Login.html";
       });
@@ -301,12 +425,12 @@
 
         if (!user) {
           userNameElem.textContent = "User";
+          userImgElem.src = DEFAULT_AVATAR;
           return;
         }
 
-        if (user.profile_picture) {
-          userImgElem.src = buildImageUrl(user.profile_picture);
-        }
+        userImgElem.src = buildImageUrl(user.profile_picture);
+        userImgElem.onerror = () => { userImgElem.src = DEFAULT_AVATAR; };
 
         const firstName = user.first_name || "";
         const lastName = user.last_name || "";
@@ -337,8 +461,10 @@
           div.innerHTML = `
             <div class="post_header">
               <div class="logo_profile">
-                <img style="width: stretch; height: stretch; object-fit: cover"
-                     src="${authorPic}" alt="">
+                <img style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"
+                     src="${authorPic}"
+                     onerror="this.onerror=null;this.src='${DEFAULT_AVATAR}';"
+                     alt="">
               </div>
               <div class="post_header_right">
                 <h3 class="name">${escapeHtml(authorName)}</h3>
@@ -392,6 +518,71 @@
         div.textContent = str;
         return div.innerHTML;
       }
+
+      const overlay = document.getElementById("createPostOverlay");
+      const openModalBtn = document.getElementById("addPostTrigger");
+      const closeModalBtn = document.getElementById("closeModalBtn");
+      const createPostForm = document.getElementById("createPostForm");
+      const createPostError = document.getElementById("createPostError");
+      const createPostSubmitBtn = document.getElementById("createPostSubmitBtn");
+
+      openModalBtn.addEventListener("click", () => {
+        overlay.classList.add("open");
+      });
+
+      closeModalBtn.addEventListener("click", closeModal);
+      overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) closeModal();
+      });
+
+      function closeModal() {
+        overlay.classList.remove("open");
+        createPostForm.reset();
+        createPostError.textContent = "";
+      }
+
+      createPostForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        createPostError.textContent = "";
+
+        const text = document.getElementById("postText").value.trim();
+        const imageFile = document.getElementById("postImage").files[0];
+
+        if (!text && !imageFile) {
+          createPostError.textContent = "Write something or upload an image first";
+          return;
+        }
+
+        createPostSubmitBtn.disabled = true;
+        createPostSubmitBtn.textContent = "Posting...";
+
+        try {
+          const fd = new FormData();
+          fd.append("text", text);
+          if (imageFile) fd.append("image", imageFile);
+
+          const response = await fetch(createPost, {
+            method: "POST",
+            headers: { "Authorization": token },
+            body: fd
+          });
+
+          const data = await response.json();
+
+          if (data.status === "success") {
+            closeModal();
+            loadHome(); 
+          } else {
+            createPostError.textContent = data.message || "Something went wrong, try again";
+          }
+        } catch (err) {
+          createPostError.textContent = "Server connection error";
+          console.error(err);
+        } finally {
+          createPostSubmitBtn.disabled = false;
+          createPostSubmitBtn.textContent = "Post";
+        }
+      });
 
       loadHome();
     </script>
