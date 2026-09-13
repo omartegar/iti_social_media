@@ -34,7 +34,7 @@ export const myInfo = `${serverIp}:${port}/myInfo`;
 // returns => {status:"success",'message':"..",'myself':{}, users:[]}
 export const showAllUsers = `${serverIp}:${port}/showAllUsers`;
 
-// getPrivateMessages API: method => GET
+// getPrivateMessages API: method => GET?id=123 , note:id of receiver
 // headers: {Authorization: localStorage.getItem('token')}
 // returns => {status: 'success', message: '', sender_me: {}, receiver_data: {}, messages: []}
 export const getPrivateMessages = `${serverIp}:${port}/getPrivateMessages`;

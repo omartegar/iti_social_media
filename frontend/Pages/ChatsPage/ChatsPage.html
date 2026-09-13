@@ -7,6 +7,7 @@
     <title>Messenger</title>
     <link rel="stylesheet" href="style.css" />
   </head>
+
   <body>
     <div class="chat-container">
       <aside class="sidebar">
@@ -33,6 +34,7 @@
         </div>
       </aside>
 
+      <!-- This change after clicking on specific user -->
       <main class="chat-area">
         <div class="chat-header">
           <div class="user-profile">
@@ -99,6 +101,7 @@
           <button id="sendBtn">Send</button>
         </div>
       </main>
+      <!-- This change after clicking on specific user -->
     </div>
 
     <script src="script.js"></script>
@@ -109,7 +112,6 @@
       let mySelf = {};
       let friendsList = document.getElementsByClassName("friends")[0];
       let chatsArea = document.getElementsByClassName("chat-area")[0];
-      console.log(chatsArea);
 
       async function requestAllUsersFromBackend() {
         const response = await fetch(showAllUsers, {
