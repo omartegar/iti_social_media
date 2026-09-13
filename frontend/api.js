@@ -29,6 +29,11 @@ export const deletePost = `${serverIp}:${port}/deletePost`;
 // headers: {Authorization: localStorage.getItem('token')}
 export const myInfo = `${serverIp}:${port}/myInfo`;
 
+// showAllUsers API: method => GET
+// headers: {Authorization: localStorage.getItem('token')}
+// returns => {status:"success",'message':"..",'myself':{}, users:[]}
+export const showAllUsers = `${serverIp}:${port}/showAllUsers`;
+
 /*
 fetch() usage:
 
