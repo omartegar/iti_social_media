@@ -34,6 +34,11 @@ export const myInfo = `${serverIp}:${port}/myInfo`;
 // returns => {status:"success",'message':"..",'myself':{}, users:[]}
 export const showAllUsers = `${serverIp}:${port}/showAllUsers`;
 
+// getPrivateMessages API: method => GET
+// headers: {Authorization: localStorage.getItem('token')}
+// returns => {status: 'success', message: '', sender_me: {}, receiver_data: {}, messages: []}
+export const getPrivateMessages = `${serverIp}:${port}/getPrivateMessages`;
+
 /*
 fetch() usage:
 
