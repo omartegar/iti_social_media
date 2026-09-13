@@ -11,7 +11,9 @@ try {
     require(__DIR__ . '/../config/conn.php');
 
     $friendsStmt = $pdo->prepare("SELECT id, first_name, last_name, email, profile_picture FROM users");
-    $postStmt = $pdo->prepare("SELECT id, user_id, content, image, created_at FROM posts ORDER BY id DESC");
+    $postStmt = $pdo->prepare("SELECT id, user_id, content, image, created_at,
+        (SELECT COUNT(*) FROM likes WHERE likes.post_id = posts.id) AS likes
+        FROM posts ORDER BY id DESC");
 
     if (!$friendsStmt->execute()) {
         echo json_encode(['status' => "failed", 'message' => "An error has occurred while returning friends list"]);

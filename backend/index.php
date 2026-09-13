@@ -37,6 +37,9 @@ if ($request_uri === '/' || $request_uri === "") {
 } else if ($request_uri === '/sendPrivateMessage') {
     require(__DIR__ . '/messages/sendPrivateMessage.php');
     exit;
+} else if ($request_uri === '/createLike') {
+    require(__DIR__ . '/likes/createLike.php');
+    exit;
 } else {
     echo json_encode(['status' => 'failed', 'message' => "Invalid route or api request"]);
     exit;

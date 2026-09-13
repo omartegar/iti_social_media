@@ -28,3 +28,9 @@ export const getPrivateMessages = `${API_BASE_URL}/getPrivateMessages`;
 
 // sendPrivateMessage expects JSON: { receiver_id, message }.
 export const sendPrivateMessage = `${API_BASE_URL}/sendPrivateMessage`;
+
+// METHOD: POST
+// addLikeToPost needs : post_id key in body json.stringify({})
+export const createLike = `${API_BASE_URL}/createLike`;
+// but with method: DELETE
+export const deleteLike = `${API_BASE_URL}/createLike`;
