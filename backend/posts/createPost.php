@@ -20,7 +20,7 @@ try {
     }
 
 
-    if (isset($text) && strlen($text) > 5 && isset($image) && $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
+    if (isset($text) && strlen($text) > 5 && isset($image) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         // both
         if (strlen($text) > 1000) {
             echo json_encode(['status' => 'failed', 'message' => "Post text is too long, maximum post text is 1000 characters."]);
@@ -134,7 +134,7 @@ try {
 
         $new_image_name = bin2hex(random_bytes(10)) . "." . $imageExt;
         $from = $_FILES['image']['tmp_name'];
-        $to = "/../assets/images/" . $new_image_name;
+        $to = "../assets/images/" . $new_image_name;
         if (move_uploaded_file($from, $to)) {
             $success_img_url = $new_image_name;
             require(__DIR__ . '/../config/conn.php');
