@@ -34,7 +34,7 @@ try {
     }
 
     $deleteStmt = $pdo->prepare("DELETE FROM posts WHERE id = :id");
-    if ($deleteStmt->execute(['id' => $logged_in_user['id']])) {
+    if ($deleteStmt->execute(['id' => $rawData['id']])) {
         echo json_encode(['status' => 'success', 'message' => "Post deleted successfully"]);
         exit;
     } else {
