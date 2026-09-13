@@ -169,7 +169,7 @@
       <div class="left_side">
         <div class="current_user">
           <img id="currentUserImg" src="../ProfilePage/images/f547d800625af9056d62efe8969aeea0.jpg" alt="">
-          <span id="currentUserName">...</span>
+          <span id="currentUserName">Loading...</span>
         </div>
         <div class="left_link">
           <a href="HomePage.html">
@@ -224,6 +224,15 @@
 
     <script type="module">
       import { getHomeData } from "../../api.js";
+      const UPLOADS_BASE = "https://iti-api.wasmer.app:443/uploads/";
+
+      function buildImageUrl(filename) {
+        if (!filename) return "default_avatar.png";
+        if (filename.startsWith("http://") || filename.startsWith("https://")) {
+          return filename;
+        }
+        return UPLOADS_BASE + filename;
+      }
 
       const token = localStorage.getItem("token");
       if (!token) {
@@ -244,33 +253,69 @@
           });
 
           const data = await response.json();
+          console.log("Full API Data:", data);
 
           if (data.status !== "success") {
             document.getElementById("stateMsg").textContent = data.message || "Failed to load data";
             document.getElementById("friendsMsg").textContent = "";
+            document.getElementById("currentUserName").textContent = "User";
             return;
           }
 
-          renderCurrentUser(data.user_info || null);
-          renderPosts(data.posts || []);
-          
-          const currentUserId = data.user_info ? data.user_info.id : null;
-          renderFriends(data.friends || [], currentUserId);
+          const currentUserId = data.my_id || null;
+          const friends = data.friends || [];
+
+          const currentUser = friends.find(f => String(f.id ?? f.user_id) === String(currentUserId))
+                            || data.user_info 
+                            || null;
+
+          const usersById = buildUsersMap(currentUser, friends);
+
+          renderCurrentUser(currentUser);
+          renderPosts(data.posts || [], usersById, currentUserId);
+          renderFriends(friends, currentUserId);
         } catch (err) {
           document.getElementById("stateMsg").textContent = "Server connection error";
           document.getElementById("friendsMsg").textContent = "";
+          document.getElementById("currentUserName").textContent = "User";
           console.error(err);
         }
       }
 
-      function renderCurrentUser(user) {
-        if (!user) return;
-        document.getElementById("currentUserImg").src = "../ProfilePage/images/f547d800625af9056d62efe8969aeea0.jpg";
-        document.getElementById("currentUserName").textContent =
-          (user.first_name || "") + " " + (user.last_name || "");
+      function buildUsersMap(currentUser, friends) {
+        const map = {};
+        if (currentUser && (currentUser.id != null || currentUser.user_id != null)) {
+          const id = currentUser.id ?? currentUser.user_id;
+          map[id] = currentUser;
+        }
+        friends.forEach((friend) => {
+          const id = friend.id ?? friend.user_id;
+          if (id != null) map[id] = friend;
+        });
+        return map;
       }
 
-      function renderPosts(posts) {
+      function renderCurrentUser(user) {
+        const userNameElem = document.getElementById("currentUserName");
+        const userImgElem = document.getElementById("currentUserImg");
+
+        if (!user) {
+          userNameElem.textContent = "User";
+          return;
+        }
+
+        if (user.profile_picture) {
+          userImgElem.src = buildImageUrl(user.profile_picture);
+        }
+
+        const firstName = user.first_name || "";
+        const lastName = user.last_name || "";
+        const fullName = `${firstName} ${lastName}`.trim();
+
+        userNameElem.textContent = fullName !== "" ? fullName : (user.name || user.username || "User");
+      }
+
+      function renderPosts(posts, usersById, currentUserId) {
         const container = document.getElementById("postsContainer");
         container.innerHTML = "";
 
@@ -280,16 +325,23 @@
         }
 
         posts.forEach((post) => {
+          const author = usersById[post.user_id] || {};
+          const firstName = post.first_name || author.first_name || '';
+          const lastName = post.last_name || author.last_name || '';
+          const authorName = (firstName + ' ' + lastName).trim() || author.name || author.username || 'Unknown';
+          const authorPic = buildImageUrl(post.profile_picture || author.profile_picture);
+          const postImage = post.image ? buildImageUrl(post.image) : null;
+
           const div = document.createElement("div");
           div.className = "post";
           div.innerHTML = `
             <div class="post_header">
               <div class="logo_profile">
                 <img style="width: stretch; height: stretch; object-fit: cover"
-                     src="${post.profile_picture || 'default_avatar.png'}" alt="">
+                     src="${authorPic}" alt="">
               </div>
               <div class="post_header_right">
-                <h3 class="name">${(post.first_name || '') + ' ' + (post.last_name || '')}</h3>
+                <h3 class="name">${escapeHtml(authorName)}</h3>
               </div>
               <div class="prag">
                 <p style="margin: 0; letter-spacing: 1px; font-size: large">
@@ -297,9 +349,9 @@
                 </p>
               </div>
             </div>
-            ${post.image ? `
+            ${postImage ? `
             <div class="post_img">
-              <img src="${post.image}" alt=""
+              <img src="${postImage}" alt=""
                    style="width: 100%; height: 100%; border-radius: 8px; object-fit: cover;">
             </div>` : '<div class="post_img"></div>'}
             <div class="post_active">
@@ -317,8 +369,10 @@
         const container = document.getElementById("friendsList");
         container.innerHTML = "";
 
-        // تصفية الأصدقاء واستبعاد المستخدم الحالي بالـ id
-        const filteredFriends = friends.filter((friend) => friend.id !== currentUserId);
+        const filteredFriends = friends.filter((friend) => {
+          const friendId = friend.id ?? friend.user_id;
+          return String(friendId) !== String(currentUserId);
+        });
 
         if (filteredFriends.length === 0) {
           container.innerHTML = '<div class="state-msg">No friends yet</div>';
@@ -327,7 +381,8 @@
 
         filteredFriends.forEach((friend) => {
           const li = document.createElement("li");
-          li.textContent = (friend.first_name || '') + " " + (friend.last_name || '');
+          const friendName = `${friend.first_name || ''} ${friend.last_name || ''}`.trim();
+          li.textContent = friendName || friend.name || "Friend";
           container.appendChild(li);
         });
       }
