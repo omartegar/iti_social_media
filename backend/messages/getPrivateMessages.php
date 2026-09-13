@@ -17,9 +17,9 @@ try {
     OR receiver_id = :sender_id
     AND sender_id = :receiver_id
     INNER JOIN users
+    ON users.id = messages.sender_id
+    OR users.id = messages.receiver_id
     ORDER BY id DESC");
-    // ON users.id = messages.sender_id
-    // OR users.id = messages.receiver_id
 
     $receiver_data = $pdo->prepare("SELECT id, first_name, last_name, email, created_at
     FROM users WHERE id = :id");
