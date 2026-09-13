@@ -28,6 +28,9 @@ if ($request_uri === '/' || $request_uri === "") {
 } else if ($request_uri === '/myInfo') {
     require(__DIR__ . '/users/myInfo.php');
     exit;
+} else if ($request_uri === "/showAllUsers") {
+    require(__DIR__ . '/messages/showAllUsers.php');
+    exit;
 } else {
     echo json_encode(['status' => 'failed', 'message' => "Invalid route or api request"]);
     exit;
