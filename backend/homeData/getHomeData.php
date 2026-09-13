@@ -12,7 +12,10 @@ try {
 
     $friendsStmt = $pdo->prepare("SELECT id, first_name, last_name, email, profile_picture FROM users");
     $postStmt = $pdo->prepare("SELECT id, user_id, content, image, created_at,
-        (SELECT COUNT(*) FROM likes WHERE likes.post_id = posts.id) AS likes
+        (SELECT COUNT(*) FROM likes WHERE likes.post_id = posts.id) AS likes,
+        EXISTS (SELECT 1 FROM likes AS user_likes
+            WHERE user_likes.post_id = posts.id
+            AND user_likes.user_id = :current_user_id) AS liked_by_me
         FROM posts ORDER BY id DESC");
 
     if (!$friendsStmt->execute()) {
@@ -20,7 +23,7 @@ try {
         exit;
     }
 
-    if (!$postStmt->execute()) {
+    if (!$postStmt->execute(['current_user_id' => $logged_in_user['id']])) {
         echo json_encode(['status' => 'failed', 'message' => "An error has occured while returning posts list"]);
         exit;
     }

@@ -263,13 +263,52 @@
 
       .post_active {
         display: flex;
-        justify-content: space-evenly;
         align-items: center;
+        padding: 10px 14px 14px;
+        border-top: 1px solid #edf0f2;
       }
 
-      .post_active li {
-        width: 100px;
-        text-align: center;
+      .like_button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 0;
+        border-radius: 20px;
+        padding: 8px 14px;
+        color: #65676b;
+        background: #f0f2f5;
+        font-size: 14px;
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          color 0.2s,
+          transform 0.2s;
+      }
+
+      .like_button:hover {
+        background: #ffe8ed;
+        color: #e0245e;
+      }
+
+      .like_button.liked {
+        color: #e0245e;
+        background: #ffe8ed;
+      }
+
+      .like_button:disabled {
+        cursor: wait;
+        opacity: 0.65;
+      }
+
+      .like_button i {
+        width: auto;
+        font-size: 17px;
+      }
+
+      .like_status {
+        margin-left: 10px;
+        color: #d93025;
+        font: 12px sans-serif;
       }
 
       .friends_list {
@@ -432,7 +471,12 @@
     </div>
 
     <script type="module">
-      import { getHomeData, createPost } from "../../api.js";
+      import {
+        getHomeData,
+        createPost,
+        createLike,
+        deleteLike,
+      } from "../../api.js";
       const UPLOADS_BASE = "https://iti-api.wasmer.app:443/assets/images/";
       const DEFAULT_AVATAR =
         "../ProfilePage/images/f547d800625af9056d62efe8969aeea0.jpg";
@@ -601,14 +645,62 @@
                 : ""
             }
             <div class="post_active">
-              <li><i class="fa-regular fa-comment"></i></li>
-              <li><i class="fa-solid fa-retweet"></i></li>
-              <li><i class="fa-regular fa-heart"></i></li>
-              <li><i class="fa-solid fa-arrow-up-from-bracket"></i></li>
+              <button class="like_button ${Number(post.liked_by_me) === 1 ? "liked" : ""}"
+                      type="button"
+                      data-post-id="${post.id}"
+                      data-liked="${Number(post.liked_by_me) === 1}"
+                      data-likes="${Number(post.likes) || 0}"
+                      aria-pressed="${Number(post.liked_by_me) === 1}">
+                <i class="fa-${Number(post.liked_by_me) === 1 ? "solid" : "regular"} fa-heart"></i>
+                <span>${Number(post.likes) || 0} ${Number(post.likes) === 1 ? "like" : "likes"}</span>
+              </button>
+              <span class="like_status" aria-live="polite"></span>
             </div>
           `;
           container.appendChild(div);
+          div
+            .querySelector(".like_button")
+            .addEventListener("click", toggleLike);
         });
+      }
+
+      async function toggleLike(event) {
+        const button = event.currentTarget;
+        const postId = button.dataset.postId;
+        const wasLiked = button.dataset.liked === "true";
+        const status = button.nextElementSibling;
+        const count = Number(button.dataset.likes) || 0;
+
+        button.disabled = true;
+        status.textContent = "";
+
+        try {
+          const response = await fetch(wasLiked ? deleteLike : createLike, {
+            method: wasLiked ? "DELETE" : "POST",
+            headers: {
+              Authorization: localStorage.getItem("token"),
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ post_id: postId }),
+          });
+          const data = await response.json();
+
+          if (data.status !== "success") {
+            throw new Error(data.message || "Unable to update like");
+          }
+
+          const isLiked = !wasLiked;
+          const newCount = Math.max(0, count + (isLiked ? 1 : -1));
+          button.dataset.liked = String(isLiked);
+          button.dataset.likes = String(newCount);
+          button.classList.toggle("liked", isLiked);
+          button.setAttribute("aria-pressed", String(isLiked));
+          button.innerHTML = `<i class="fa-${isLiked ? "solid" : "regular"} fa-heart"></i><span>${newCount} ${newCount === 1 ? "like" : "likes"}</span>`;
+        } catch (error) {
+          status.textContent = error.message;
+        } finally {
+          button.disabled = false;
+        }
       }
 
       function formatPostDate(value) {
