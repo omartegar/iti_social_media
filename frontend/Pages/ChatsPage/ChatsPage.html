@@ -35,103 +35,139 @@
       </aside>
 
       <main class="chat-area">
-        <!-- Comes from backend response after choosing a user -->
+        <div class="chat-empty-state">
+          <div class="chat-empty-icon">&#9993;</div>
+          <h1>Your conversations, in one place</h1>
+          <p>Select a person from the left to open your private chat.</p>
+        </div>
       </main>
     </div>
 
     <script src="script.js"></script>
 
     <script type="module">
-      import { getPrivateMessages } from "../../api.js";
+      import { getPrivateMessages, sendPrivateMessage } from "../../api.js";
+
+      window.sendPrivateMessageUrl = sendPrivateMessage;
 
       async function openPrivateChat(userId) {
         const chatArea = document.getElementsByClassName("chat-area")[0];
-        chatArea.innerHTML = "<h2><center>Loading...</center></h2>";
+        window.activeChatUserId = userId;
+        const selectedFriend = [...document.querySelectorAll(".friend")].find(
+          (friend) => String(friend.dataset.userId) === String(userId),
+        );
 
-        async function getUserDataAndMessage(userId) {
+        document.querySelectorAll(".friend").forEach((friend) => {
+          friend.classList.toggle("active", friend === selectedFriend);
+        });
+
+        chatArea.innerHTML = `
+          <div class="chat-loading-state">
+            <div class="loading-spinner"></div>
+            <p>Opening your conversation...</p>
+          </div>`;
+
+        try {
           const response = await fetch(getPrivateMessages + `?id=${userId}`, {
             method: "GET",
             headers: { Authorization: localStorage.getItem("token") },
           });
-
           const data = await response.json();
-          if (data.status === "success") {
-            console.log(data);
-            let messages = data.messages; // an array
-            chatArea.innerHTML = "";
-            //   Append header
-            chatArea.innerHTML += `
-    <div class="chat-header">
-          <div class="user-profile">
-            <div class="avatar" id="chatAvatar">${data.receiver_data.first_name[0]}</div>
 
-            <div>
-              <h3 id="chatName">${data.receiver_data.first_name + " " + data.receiver_data.last_name}</h3>
-              <span id="chatStatus">Status - Soon</span>
-            </div>
-          </div>
-
-          <button class="info-btn" id="infoBtn">ⓘ</button>
-        </div>`;
-
-            // Append profile-panel
-            chatArea.innerHTML += `
-    <div class="profile-panel" id="profilePanel">
-          <div class="profile-avatar" id="profileAvatar">${data.receiver_data.first_name[0]}</div>
-
-          <h2 id="profileName">${data.receiver_data.first_name[0]}</h2>
-
-          <p id="profileStatus">Soon:Online</p>
-
-          <div class="profile-info">
-            <div>
-              <span>Email</span>
-              <p id="profileEmail">${data.receiver_data.email}</p>
-            </div>
-
-            <div>
-              <span>Phone</span>
-              <p id="profilePhone">${data.receiver_data.phone}</p>
-            </div>
-
-            <div>
-              <span>About</span>
-              <p id="profileAbout">Hey there! I am using Messenger.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="messages" id="messages">
-        
-            <!-- ANA -->
-            <div class="message sent">
-              <p>I'm good, how about you?</p>
-              <span>10:31 AM</span>
-            </div>
-            
-            <!-- HWA -->
-            <div class="message received">
-              <p>Hello, how are you?</p>
-              <span>10:30 AM</span>
-            </div>
-
-        <div class="message-box">
-          <input
-            type="text"
-            id="messageInput"
-            placeholder="Write a message..."
-          />
-
-          <button id="sendBtn">Send</button>
-        </div>`;
-          } else {
-            console.error(data);
-            alert(data.message);
-            chatArea.innerHTML = `<h2><center>${data.message}</center></h2>`;
+          if (data.status !== "success") {
+            throw new Error(data.message || "Unable to load this conversation");
           }
+
+          const receiver = data.receiver_data || {};
+          const firstName = receiver.first_name || "User";
+          const lastName = receiver.last_name || "";
+          const fullName = `${firstName} ${lastName}`.trim();
+          const avatarLetter = escapeHtml(firstName.charAt(0).toUpperCase());
+          const messages = Array.isArray(data.messages) ? data.messages : [];
+
+          chatArea.innerHTML = `
+            <div class="chat-header">
+              <div class="user-profile">
+                <div class="avatar">${avatarLetter}</div>
+                <div>
+                  <h3>${escapeHtml(fullName)}</h3>
+                  <span>Private conversation</span>
+                </div>
+              </div>
+              <button class="info-btn" id="infoBtn" type="button" aria-label="Show profile">ⓘ</button>
+            </div>
+
+            <div class="profile-panel" id="profilePanel">
+              <div class="profile-avatar">${avatarLetter}</div>
+              <h2>${escapeHtml(fullName)}</h2>
+              <p>Private conversation</p>
+              <div class="profile-info">
+                <div><span>Email</span><p>${escapeHtml(receiver.email || "Not available")}</p></div>
+                <div><span>Phone</span><p>${escapeHtml(receiver.phone || "Not available")}</p></div>
+                <div><span>About</span><p>Start a conversation and say hello.</p></div>
+              </div>
+            </div>
+
+            <div class="messages" id="messages">
+              ${renderMessages(messages, data.sender_me?.id)}
+            </div>
+
+            <div class="message-box">
+              <input type="text" id="messageInput" placeholder="Write a message..." />
+              <button id="sendBtn" type="button">Send</button>
+              <span class="send-status" id="sendStatus" role="status"></span>
+            </div>`;
+
+          document.getElementById("messages").scrollTop =
+            document.getElementById("messages").scrollHeight;
+        } catch (error) {
+          console.error(error);
+          chatArea.innerHTML = `
+            <div class="chat-error-state">
+              <h2>Conversation unavailable</h2>
+              <p>${escapeHtml(error.message)}</p>
+            </div>`;
+        }
+      }
+
+      function renderMessages(messages, currentUserId) {
+        if (messages.length === 0) {
+          return `
+            <div class="messages-empty-state">
+              <div class="messages-empty-icon">&#10024;</div>
+              <h2>No messages yet</h2>
+              <p>Start the conversation with a friendly message.</p>
+            </div>`;
         }
 
-        getUserDataAndMessage(userId);
+        return messages
+          .slice()
+          .reverse()
+          .map((message) => {
+            const isSent = String(message.sender_id) === String(currentUserId);
+            return `
+              <div class="message ${isSent ? "sent" : "received"}">
+                <p>${escapeHtml(message.content || "")}</p>
+                <span>${formatMessageTime(message.created_at)}</span>
+              </div>`;
+          })
+          .join("");
+      }
+
+      function formatMessageTime(value) {
+        if (!value) return "Time unavailable";
+        const date = new Date(String(value).replace(" ", "T"));
+        if (Number.isNaN(date.getTime())) return "Time unavailable";
+        return new Intl.DateTimeFormat(undefined, {
+          hour: "numeric",
+          minute: "2-digit",
+        }).format(date);
+      }
+
+      function escapeHtml(value) {
+        const element = document.createElement("div");
+        element.textContent = String(value ?? "");
+        return element.innerHTML;
       }
 
       window.openPrivateChat = openPrivateChat;
@@ -171,6 +207,7 @@
             <div
             onclick = "openPrivateChat(${user.id})"
             class="friend"
+            data-user-id="${user.id}"
             data-name="Ebtisam"
             data-status="Online"
             data-email="${user.email}"

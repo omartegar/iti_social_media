@@ -1,76 +1,30 @@
-// Made by Omar Ahmed Hashem
-// API's
-const serverIp = "https://iti-api.wasmer.app";
-const port = "443";
+// All frontend requests use this deployed backend.
+const API_BASE_URL = "https://iti-api.wasmer.app:443";
 
-// signup API: method => POST
-// body: {firstname, lastname, phone, email, image, password, confirmpassword} ,, using "const fd= new FormData();"
-export const signup = `${serverIp}:${port}/signup`;
+// Authentication
+// signup expects FormData with user fields and an optional image.
+export const signup = `${API_BASE_URL}/signup`;
 
-// login API: method => POST
-// body: {email, password}
-export const login = `${serverIp}:${port}/login`;
+// login expects JSON: { email, password }.
+export const login = `${API_BASE_URL}/login`;
 
-// getHomeData API: method => GET
-// headers: {Authorization: localStorage.getItem('token')}
-export const getHomeData = `${serverIp}:${port}/getHomeData`;
+// Home and posts
+// These endpoints require: Authorization: localStorage.getItem("token").
+export const getHomeData = `${API_BASE_URL}/getHomeData`;
 
-// createPost API: method => POST
-// headers: {Authorization: localStorage.getItem('token')}
-// body: fd                  , const fd = new FormData() and add (text|image or both)
-export const createPost = `${serverIp}:${port}/createPost`;
+// createPost expects FormData with text, image, or both.
+export const createPost = `${API_BASE_URL}/createPost`;
 
-// deletePost API: method => DELETE
-// headers: {Authorization: localStorage.getItem('token')}
-// body: JSON.stringify({id})
-export const deletePost = `${serverIp}:${port}/deletePost`;
+// deletePost expects JSON: { id }.
+export const deletePost = `${API_BASE_URL}/deletePost`;
 
-// getUserProfile API: method => GET
-// headers: {Authorization: localStorage.getItem('token')}
-export const myInfo = `${serverIp}:${port}/myInfo`;
+// Users
+export const myInfo = `${API_BASE_URL}/myInfo`;
+export const showAllUsers = `${API_BASE_URL}/showAllUsers`;
 
-// showAllUsers API: method => GET
-// headers: {Authorization: localStorage.getItem('token')}
-// returns => {status:"success",'message':"..",'myself':{}, users:[]}
-export const showAllUsers = `${serverIp}:${port}/showAllUsers`;
+// Messages
+// getPrivateMessages expects the receiver id as a query string: ?id=123.
+export const getPrivateMessages = `${API_BASE_URL}/getPrivateMessages`;
 
-// getPrivateMessages API: method => GET?id=123 , note:id of receiver
-// headers: {Authorization: localStorage.getItem('token')}
-// returns => {status: 'success', message: '', sender_me: {}, receiver_data: {}, messages: []}
-export const getPrivateMessages = `${serverIp}:${port}/getPrivateMessages`;
-
-// sendPrivateMessage API: method => POST
-// headers: {Authorization: localStorage.getItem('token')}
-// body: JSON.stringify({'receiver_id': 123, 'message':"TEXT_YOU_WANT_TO_SEND"})     , receiver_id: "VALUE_OF_RECEIVER_ID_TO_SEND_TO"
-// returns => {status: 'success','message':".."}   // if message success to send
-export const sendPrivateMessage = `${serverIp}:${port}/sendPrivateMessage`;
-/*
-fetch() usage:
-
-fetch("API_URL_ENDPOINT", OPTIONAL_OPTIONS);
-
-example 1:
-
-async function myFunc()
-{
-
-    const response = fetch("API_URL_ENDPOINT", {
-        method:"GET",
-        headers: {},
-        body: {}
-    });
-
-    const data = await response.json();
-
-    if(data.status === "success"){
-        // BACKEND WORKS AND SENT ANSWER
-    }else{
-        // BACKEND SAYS THERE IS AN ERROR
-        // CHECK IT USING message
-        console.log(data.message);  
-    }
-}
-
-
-
-*/
+// sendPrivateMessage expects JSON: { receiver_id, message }.
+export const sendPrivateMessage = `${API_BASE_URL}/sendPrivateMessage`;
