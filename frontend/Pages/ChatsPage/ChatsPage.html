@@ -24,89 +24,11 @@
         </div>
 
         <div class="friends">
-          <div
-            class="friend active"
-            data-name="Fares"
-            data-status="Online"
-            data-email="fares@gmail.com"
-            data-phone="+20 100 000 0000"
-            data-about="Hey there! I am using Messenger."
-            data-message="Hello, how are you?"
-          >
-            <div class="avatar">F</div>
-
-            <div class="friend-info">
-              <h3>Fares</h3>
-              <p>Online</p>
-            </div>
-          </div>
-
-          <div
-            class="friend"
-            data-name="Mohamed Khaled"
-            data-status="Online"
-            data-email="mohamed@gmail.com"
-            data-phone="+20 101 000 0000"
-            data-about="Always available for a good chat."
-            data-message="How is your project going?"
-          >
-            <div class="avatar">M</div>
-
-            <div class="friend-info">
-              <h3>Mohamed Khaled</h3>
-              <p>Online</p>
-            </div>
-          </div>
-
-          <div
-            class="friend"
-            data-name="Omar"
-            data-status="Offline"
-            data-email="omar@gmail.com"
-            data-phone="+20 102 000 0000"
-            data-about="See you soon."
-            data-message="See you tomorrow."
-          >
-            <div class="avatar">O</div>
-
-            <div class="friend-info">
-              <h3>Omar</h3>
-              <p>Offline</p>
-            </div>
-          </div>
-
-          <div
-            class="friend"
-            data-name="Ebtisam"
-            data-status="Online"
-            data-email="ebtisam@gmail.com"
-            data-phone="+20 103 000 0000"
-            data-about="Have a nice day!"
-            data-message="Don't forget the meeting."
-          >
-            <div class="avatar">E</div>
-
-            <div class="friend-info">
-              <h3>Ebtisam</h3>
-              <p>Online</p>
-            </div>
-          </div>
-
-          <div
-            class="friend"
-            data-name="Maria Victor"
-            data-status="Offline"
-            data-email="maria@gmail.com"
-            data-phone="+20 104 000 0000"
-            data-about="Nice talking to you."
-            data-message="Nice talking to you."
-          >
-            <div class="avatar">M</div>
-
-            <div class="friend-info">
-              <h3>Maria Victor</h3>
-              <p>Offline</p>
-            </div>
+          <!-- Comes from backend -->
+          <div>
+            <center>
+              <p>Loading...</p>
+            </center>
           </div>
         </div>
       </aside>
@@ -118,7 +40,7 @@
 
             <div>
               <h3 id="chatName">Fares</h3>
-              <span id="chatStatus">Online</span>
+              <span id="chatStatus">Status - Soon</span>
             </div>
           </div>
 
@@ -181,11 +103,17 @@
 
     <script src="script.js"></script>
     <script type="module">
-      let allUsersFromBackend = [];
-      let mySelf = {};
-
       // BY Omar Ahmed Hashem
       import { showAllUsers } from "../../api.js";
+      let allUsersFromBackend = [];
+      let mySelf = {};
+      let friendsList = document.getElementsByClassName("friends")[0];
+      let chatsArea = document.getElementsByClassName("chat-area")[0];
+      console.log(chatsArea);
+
+      async function openPrivateChat(userId) {
+        console.log(userId);
+      }
 
       async function requestAllUsersFromBackend() {
         const response = await fetch(showAllUsers, {
@@ -199,6 +127,32 @@
           console.log(data);
           allUsersFromBackend = data.users;
           mySelf = data.myself;
+
+          friendsList.innerHTML = ""; // clear recent fake users
+
+          data.users.map((user) => {
+            if (user.id !== mySelf.id) {
+              friendsList.innerHTML += `
+            <div
+            onclick = "openPrivateChat(${user.id});"
+            class="friend"
+            data-name="Ebtisam"
+            data-status="Online"
+            data-email="${user.email}"
+            data-phone="+20 103 000 0000"
+            data-about="Have a nice day!"
+            data-message="Don't forget the meeting."
+          >
+            <div class="avatar">${user.first_name[0]}</div>
+
+            <div class="friend-info">
+              <h3>${user.first_name + " " + user.last_name}</h3>
+              <p>Online</p>
+            </div>
+          </div>
+            `;
+            }
+          });
         } else {
           console.error(data);
           alert(data.message);
