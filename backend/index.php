@@ -31,6 +31,12 @@ if ($request_uri === '/' || $request_uri === "") {
 } else if ($request_uri === "/showAllUsers") {
     require(__DIR__ . '/messages/showAllUsers.php');
     exit;
+} else if ($request_uri === "/getPrivateMessages") {
+    require(__DIR__ . '/messages/getPrivateMessages.php');
+    exit;
+} else if ($request_uri === '/sendPrivateMessage') {
+    require(__DIR__ . '/messages/sendPrivateMessage.php');
+    exit;
 } else {
     echo json_encode(['status' => 'failed', 'message' => "Invalid route or api request"]);
     exit;

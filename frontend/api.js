@@ -39,6 +39,11 @@ export const showAllUsers = `${serverIp}:${port}/showAllUsers`;
 // returns => {status: 'success', message: '', sender_me: {}, receiver_data: {}, messages: []}
 export const getPrivateMessages = `${serverIp}:${port}/getPrivateMessages`;
 
+// sendPrivateMessage API: method => POST
+// headers: {Authorization: localStorage.getItem('token')}
+// body: JSON.stringify({'receiver_id': 123, 'message':"TEXT_YOU_WANT_TO_SEND"})     , receiver_id: "VALUE_OF_RECEIVER_ID_TO_SEND_TO"
+// returns => {status: 'success','message':".."}   // if message success to send
+export const sendPrivateMessage = `${serverIp}:${port}/sendPrivateMessage`;
 /*
 fetch() usage:
 

@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] !== "GET") {
 
 try {
     require(__DIR__ . '/../config/conn.php');
-    $allUsers = $pdo->prepare("SELECT first_name, last_name, email, phone, profile_picture, is_admin, created_at
+    $allUsers = $pdo->prepare("SELECT id, first_name, last_name, email, phone, profile_picture, is_admin, created_at
     FROM users ORDER BY first_name ASC");
 
     if ($allUsers->execute()) {
