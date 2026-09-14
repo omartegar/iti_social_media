@@ -33,7 +33,11 @@
         margin: 0;
         padding: 0;
         background-color: var(--bg-color);
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
         color: var(--text-main);
       }
 
@@ -111,7 +115,9 @@
         border-radius: var(--radius);
         font-weight: 600;
         font-size: 15px;
-        transition: background 0.2s ease, color 0.2s ease;
+        transition:
+          background 0.2s ease,
+          color 0.2s ease;
       }
 
       .left_link a:hover {
@@ -133,7 +139,9 @@
         font-weight: 500;
         background: var(--card-bg);
         box-shadow: var(--shadow);
-        transition: background 0.2s, transform 0.1s;
+        transition:
+          background 0.2s,
+          transform 0.1s;
       }
 
       .add_post:hover {
@@ -273,6 +281,7 @@
       }
 
       .post_header {
+        position: relative;
         display: flex;
         flex-wrap: wrap;
         padding: 16px;
@@ -311,6 +320,75 @@
         margin-top: 2px;
         color: var(--text-muted);
         font-size: 12px;
+      }
+
+      .delete_post_button {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        width: 34px;
+        height: 34px;
+        display: grid;
+        place-items: center;
+        border: 0;
+        border-radius: 50%;
+        color: var(--text-muted);
+        background: transparent;
+        cursor: pointer;
+        transition:
+          color 0.2s,
+          background 0.2s,
+          transform 0.2s;
+      }
+
+      .delete_post_button:hover {
+        color: #d93025;
+        background: #fff0f0;
+        transform: scale(1.05);
+      }
+
+      .delete_post_button:disabled {
+        opacity: 0.6;
+        cursor: wait;
+      }
+
+      .delete_post_button i {
+        width: auto;
+        font-size: 15px;
+      }
+
+      .confirm_message {
+        margin: 0 0 20px;
+        color: var(--text-muted);
+        line-height: 1.5;
+      }
+
+      .confirm_actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+
+      .confirm_actions button {
+        border: 0;
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .confirm_cancel {
+        color: var(--text-main);
+        background: #f0f2f5;
+      }
+
+      .confirm_delete {
+        color: #fff;
+        background: #d93025;
+      }
+
+      .confirm_delete:hover {
+        background: #b42318;
       }
 
       .post_img {
@@ -568,12 +646,46 @@
       </div>
     </div>
 
+    <div
+      class="modal-overlay"
+      id="deletePostOverlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="deletePostTitle"
+    >
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3 id="deletePostTitle">Delete post?</h3>
+          <button
+            type="button"
+            class="modal-close"
+            id="cancelDeleteBtn"
+            aria-label="Close"
+          >
+            &times;
+          </button>
+        </div>
+        <p class="confirm_message" id="deletePostMessage">
+          This post will be permanently removed.
+        </p>
+        <div class="confirm_actions">
+          <button type="button" class="confirm_cancel" id="cancelDeleteAction">
+            Cancel
+          </button>
+          <button type="button" class="confirm_delete" id="confirmDeleteBtn">
+            Delete post
+          </button>
+        </div>
+      </div>
+    </div>
+
     <script type="module">
       import {
         getHomeData,
         createPost,
         createLike,
         deleteLike,
+        deletePost,
       } from "../../api.js";
       const UPLOADS_BASE = "https://iti-api.wasmer.app:443/assets/images/";
       const DEFAULT_AVATAR =
@@ -717,6 +829,7 @@
 
           const div = document.createElement("div");
           div.className = postImage ? "post has-image" : "post";
+          const canDeletePost = String(post.user_id) === String(currentUserId);
           div.innerHTML = `
             <div class="post_header">
               <div class="logo_profile">
@@ -729,6 +842,14 @@
                 <h3 class="name">${escapeHtml(authorName)}</h3>
                 <span class="post_date">${escapeHtml(formatPostDate(post.created_at))}</span>
               </div>
+              ${
+                canDeletePost
+                  ? `
+              <button class="delete_post_button" type="button" aria-label="Delete post" title="Delete post">
+                <i class="fa-solid fa-trash"></i>
+              </button>`
+                  : ""
+              }
               <div class="prag">
                 <p style="margin: 0; letter-spacing: 1px; font-size: large">
                   ${escapeHtml(post.content || "")}
@@ -763,7 +884,65 @@
           div
             .querySelector(".like_button")
             .addEventListener("click", toggleLike);
+          div
+            .querySelector(".delete_post_button")
+            ?.addEventListener("click", () => {
+              openDeletePostDialog(post.id, div);
+            });
         });
+      }
+
+      let pendingDelete = null;
+
+      function openDeletePostDialog(postId, postElement) {
+        pendingDelete = { postId, postElement };
+        document.getElementById("deletePostMessage").textContent =
+          "This post and its image, if available, will be permanently removed.";
+        document.getElementById("deletePostOverlay").classList.add("open");
+      }
+
+      function closeDeletePostDialog() {
+        pendingDelete = null;
+        document.getElementById("deletePostOverlay").classList.remove("open");
+      }
+
+      async function confirmDeletePost() {
+        if (!pendingDelete) return;
+
+        const { postId, postElement } = pendingDelete;
+        const confirmButton = document.getElementById("confirmDeleteBtn");
+        confirmButton.disabled = true;
+        confirmButton.textContent = "Deleting...";
+
+        try {
+          const response = await fetch(deletePost, {
+            method: "DELETE",
+            headers: {
+              Authorization: localStorage.getItem("token"),
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ id: postId }),
+          });
+          const data = await response.json();
+
+          if (data.status !== "success") {
+            throw new Error(data.message || "The post could not be deleted");
+          }
+
+          postElement.remove();
+          const postsContainer = document.getElementById("postsContainer");
+          if (!postsContainer.querySelector(".post")) {
+            postsContainer.innerHTML =
+              '<div class="state-msg">No posts yet, write the first one!</div>';
+          }
+          closeDeletePostDialog();
+        } catch (error) {
+          document.getElementById("deletePostMessage").textContent =
+            error.message;
+        } finally {
+          confirmButton.disabled = false;
+          confirmButton.textContent = "Delete post";
+        }
       }
 
       async function toggleLike(event) {
@@ -875,6 +1054,10 @@
       const createPostSubmitBtn = document.getElementById(
         "createPostSubmitBtn",
       );
+      const deletePostOverlay = document.getElementById("deletePostOverlay");
+      const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+      const cancelDeleteAction = document.getElementById("cancelDeleteAction");
+      const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
 
       openModalBtn.addEventListener("click", () => {
         overlay.classList.add("open");
@@ -890,6 +1073,19 @@
         createPostForm.reset();
         createPostError.textContent = "";
       }
+
+      cancelDeleteBtn.addEventListener("click", closeDeletePostDialog);
+      cancelDeleteAction.addEventListener("click", closeDeletePostDialog);
+      confirmDeleteBtn.addEventListener("click", confirmDeletePost);
+      deletePostOverlay.addEventListener("click", (event) => {
+        if (event.target === deletePostOverlay) closeDeletePostDialog();
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          closeDeletePostDialog();
+        }
+      });
 
       createPostForm.addEventListener("submit", async (e) => {
         e.preventDefault();
