@@ -15,7 +15,7 @@ try {
         (SELECT COUNT(*) FROM likes WHERE likes.post_id = posts.id) AS likes,
         EXISTS (SELECT 1 FROM likes AS user_likes
             WHERE user_likes.post_id = posts.id
-            AND user_likes.user_id = :current_user_id) AS liked_by_me
+            AND user_likes.user_id = :current_user_id) AS you_liked
         FROM posts ORDER BY id DESC");
 
     if (!$friendsStmt->execute()) {
@@ -30,6 +30,11 @@ try {
 
     $friendsList = $friendsStmt->fetchAll(PDO::FETCH_ASSOC);
     $postsList = $postStmt->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($postsList as &$post) {
+        $post['likes'] = (int) $post['likes'];
+        $post['you_liked'] = (bool) $post['you_liked'];
+    }
+    unset($post);
 
     echo json_encode(['status' => 'success', 'message' => "data loaded successfully", 'my_id' => $logged_in_user['id'], 'friends' => $friendsList, 'posts' => $postsList]);
     exit;
