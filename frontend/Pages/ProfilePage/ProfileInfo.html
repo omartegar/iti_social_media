@@ -4,70 +4,163 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Profile Info</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 <style>
     * { box-sizing: border-box; }
+
     body {
-        font-family: 'Segoe UI', Tahoma, sans-serif;
-        background: #f0f2f5;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: #f7f7fb;
         display: flex;
         justify-content: center;
         align-items: flex-start;
         min-height: 100vh;
-        padding: 60px 16px;
+        padding: 48px 16px;
         margin: 0;
     }
-    .profile {
+
+    .card {
+        width: 100%;
+        max-width: 480px;
+        background: #fff;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(20, 20, 43, 0.08), 0 8px 24px rgba(20, 20, 43, 0.06);
+    }
+
+    .banner {
+        height: 120px;
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    }
+
+    .profile-body {
+        padding: 0 32px 36px;
         display: flex;
         flex-direction: column;
         align-items: center;
         text-align: center;
-        width: 100%;
-        max-width: 320px;
     }
+
     .avatar {
-        width: 110px;
-        height: 110px;
+        width: 132px;
+        height: 132px;
         border-radius: 50%;
         object-fit: cover;
-        margin-bottom: 14px;
-        background: #cfd3d8;
+        background: #e2e1f5;
+        border: 5px solid #fff;
+        margin-top: -66px;
+        margin-bottom: 16px;
     }
-    .name {
-        font-size: 20px;
-        font-weight: 600;
-        color: #1c1e21;
-        margin-bottom: 4px;
-        word-break: break-word;
-    }
-    .email {
-        font-size: 16px;
-        font-weight: 500;
-        color: #65676b;
-        margin-bottom: 8px;
-        word-break: break-word;
-    }
-    .joined {
-        font-size: 14px;
-        font-weight: 500;
-        color: #65676b;
-    }
-    .error { color: #d93025; font-size: 14px; margin-top: 10px; }
 
-    @media (max-width: 480px) {
-        body { padding-top: 40px; }
-        .avatar { width: 90px; height: 90px; }
-        .name { font-size: 18px; }
-        .email, .joined { font-size: 14px; }
+    .name {
+        font-family: 'Poppins', sans-serif;
+        font-size: 25px;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 30px;
+        word-break: break-word;
+    }
+
+    .info-list {
+        width: 100%;
+        text-align: left;
+    }
+
+    .info-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px 0;
+        border-top: 1px solid #edecf5;
+    }
+
+    .info-row:first-child {
+        border-top: none;
+    }
+
+    .info-icon {
+        width: 26px;
+        height: 26px;
+        flex-shrink: 0;
+        color: #7c3aed;
+    }
+
+    .info-text {
+        min-width: 0;
+    }
+
+    .info-label {
+        font-size: 13px;
+        color: #8b8aa3;
+        margin-bottom: 3px;
+    }
+
+    .info-value {
+        font-size: 17px;
+        color: #1a1a2e;
+        font-weight: 500;
+        word-break: break-word;
+    }
+
+    .error {
+        color: #d93025;
+        font-size: 15px;
+        margin-top: 18px;
+        text-align: center;
+    }
+
+    @media (max-width: 500px) {
+        .card { max-width: 100%; }
+        .avatar { width: 108px; height: 108px; margin-top: -54px; }
+        .name { font-size: 21px; }
     }
 </style>
 </head>
 <body>
-    <div class="profile">
-        <img class="avatar" id="avatar" src="images/f547d800625af9056d62efe8969aeea0.jpg" alt="Profile picture">
-        <div class="name" id="name">Loading...</div>
-        <div class="email" id="email"></div>
-        <div class="joined" id="joined"></div>
-        <div class="error" id="errorMsg"></div>
+    <div class="card">
+        <div class="banner"></div>
+        <div class="profile-body">
+            <img class="avatar" id="avatar" src="images/f547d800625af9056d62efe8969aeea0.jpg" alt="Profile picture">
+            <div class="name" id="name">Loading...</div>
+
+            <div class="info-list">
+                <div class="info-row">
+                    <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16v16H4z" opacity="0"/>
+                        <path d="M2 6l10 7L22 6" stroke-linecap="round" stroke-linejoin="round"/>
+                        <rect x="2" y="4" width="20" height="16" rx="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <div class="info-text">
+                        <div class="info-label">Email</div>
+                        <div class="info-value" id="email">—</div>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <div class="info-text">
+                        <div class="info-label">Phone</div>
+                        <div class="info-value" id="phone">—</div>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M16 2v4M8 2v4M3 10h18" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <div class="info-text">
+                        <div class="info-label">Joined</div>
+                        <div class="info-value" id="joined">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="error" id="errorMsg"></div>
+        </div>
     </div>
 
     <script type="module">
@@ -77,6 +170,7 @@
         const avatarEl = document.getElementById("avatar");
         const nameEl = document.getElementById("name");
         const emailEl = document.getElementById("email");
+        const phoneEl = document.getElementById("phone");
         const joinedEl = document.getElementById("joined");
         const errorMsgEl = document.getElementById("errorMsg");
 
@@ -92,7 +186,7 @@
             const response = await fetch(myInfo, {
                 method: "GET",
                 headers: {
-                    Authorization:  localStorage.getItem('token')
+                    Authorization: localStorage.getItem('token')
                 }
             });
 
@@ -105,13 +199,15 @@
                 const firstname = user?.first_name || user?.firstname || "";
                 const lastname = user?.last_name || user?.lastname || "";
                 const email = user?.email || "";
+                const phone = user?.phone || "—";
                 const createdAt = user?.created_at || user?.createdAt || "";
                 const userImage = "images/f547d800625af9056d62efe8969aeea0.jpg";
 
                 if (avatarEl) avatarEl.src = userImage;
-                if (nameEl) nameEl.textContent = `Name: ${firstname} ${lastname}`.trim();
-                if (emailEl) emailEl.textContent = `Email: ${email}`;
-                if (joinedEl) joinedEl.textContent = `Created at: ${createdAt}`;
+                if (nameEl) nameEl.textContent = `${firstname} ${lastname}`.trim();
+                if (emailEl) emailEl.textContent = email || "—";
+                if (phoneEl) phoneEl.textContent = phone;
+                if (joinedEl) joinedEl.textContent = createdAt || "—";
                 if (errorMsgEl) errorMsgEl.textContent = "";
             } else {
                 if (nameEl) nameEl.textContent = "";
